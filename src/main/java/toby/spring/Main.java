@@ -1,12 +1,13 @@
 package toby.spring;
 
 import java.sql.SQLException;
+import toby.spring.object.dependecy.NUserDao;
 import toby.spring.object.dependecy.User;
 import toby.spring.object.dependecy.UserDao;
 
 public class Main {
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
-    UserDao dao = new UserDao();
+    UserDao dao = new NUserDao();
 
     User user = new User();
     user.setId("whiteship");
