@@ -6,10 +6,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
+
   private ConnectionMaker connectionMaker;
 
+  // 의존관계 주입
   public UserDao(ConnectionMaker connectionMaker) {
     this.connectionMaker = connectionMaker;
+  }
+
+  // 의존 관계 검색
+  public UserDao() {
+    // IoC 컨테이너인 DaoFactory에게 요청
+    DaoFactory daoFactory = new DaoFactory();
+    this.connectionMaker = daoFactory.connectionMaker();
+
+    // 스프링 의존 관계 검색
+    //    AnnotationConfigApplicationContext context =
+    //        new AnnotationConfigApplicationContext(DaoFactory.class);
+    //    this.connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
   }
 
   public void add(User user) throws ClassNotFoundException, SQLException {
