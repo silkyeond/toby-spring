@@ -14,6 +14,11 @@ public class UserDao {
     this.connectionMaker = connectionMaker;
   }
 
+  // 수정자 메소드 DI 방식
+  public void setConnectionMaker(ConnectionMaker connectionMaker) {
+    this.connectionMaker = connectionMaker;
+  }
+
   // 의존 관계 검색
   public UserDao() {
     // IoC 컨테이너인 DaoFactory에게 요청

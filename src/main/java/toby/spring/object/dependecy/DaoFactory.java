@@ -8,6 +8,9 @@ public class DaoFactory {
 
   @Bean
   public UserDao userDao() {
+    UserDao userDao = new UserDao();
+    // 수정자 메소드 DI를 사용하는 팩토리 메소드
+    userDao.setConnectionMaker(connectionMaker());
     return new UserDao();
   }
 
