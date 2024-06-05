@@ -4,35 +4,42 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.sql.DataSource;
 
 public class UserDao {
+  private DataSource dataSource;
+
+  public void setDataSource(DataSource dataSource) {
+    this.dataSource = dataSource;
+  }
 
   private ConnectionMaker connectionMaker;
 
   // 의존관계 주입
-  public UserDao(ConnectionMaker connectionMaker) {
-    this.connectionMaker = connectionMaker;
-  }
+  //  public UserDao(ConnectionMaker connectionMaker) {
+  //    this.connectionMaker = connectionMaker;
+  //  }
 
   // 수정자 메소드 DI 방식
   public void setConnectionMaker(ConnectionMaker connectionMaker) {
     this.connectionMaker = connectionMaker;
   }
 
-  // 의존 관계 검색
-  public UserDao() {
-    // IoC 컨테이너인 DaoFactory에게 요청
-    DaoFactory daoFactory = new DaoFactory();
-    this.connectionMaker = daoFactory.connectionMaker();
-
-    // 스프링 의존 관계 검색
-    //    AnnotationConfigApplicationContext context =
-    //        new AnnotationConfigApplicationContext(DaoFactory.class);
-    //    this.connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
-  }
+  //  //   의존 관계 검색
+  //  public UserDao() {
+  //    // IoC 컨테이너인 DaoFactory에게 요청
+  //    DaoFactory daoFactory = new DaoFactory();
+  //    this.connectionMaker = daoFactory.connectionMaker();
+  //
+  // 스프링 의존 관계 검색
+  //    AnnotationConfigApplicationContext context =
+  //        new AnnotationConfigApplicationContext(DaoFactory.class);
+  //    this.connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
+  //  }
 
   public void add(User user) throws ClassNotFoundException, SQLException {
-    Connection c = connectionMaker.makeConnection();
+    //    Connection c = connectionMaker.makeConnection();
+    Connection c = dataSource.getConnection();
     PreparedStatement ps =
         c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
     ps.setString(1, user.getId());
@@ -46,7 +53,8 @@ public class UserDao {
   }
 
   public User get(String id) throws ClassNotFoundException, SQLException {
-    Connection c = connectionMaker.makeConnection();
+//    Connection c = connectionMaker.makeConnection();
+    Connection c = dataSource.getConnection();
     PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
     ps.setString(1, id);
 

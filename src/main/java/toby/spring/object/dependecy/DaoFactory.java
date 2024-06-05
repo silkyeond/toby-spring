@@ -1,7 +1,9 @@
 package toby.spring.object.dependecy;
 
+import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 @Configuration
 public class DaoFactory {
@@ -9,9 +11,22 @@ public class DaoFactory {
   @Bean
   public UserDao userDao() {
     UserDao userDao = new UserDao();
+    //    userDao.setDataSource(dataSource());
     // 수정자 메소드 DI를 사용하는 팩토리 메소드
     userDao.setConnectionMaker(connectionMaker());
     return new UserDao();
+  }
+
+  @Bean
+  public DataSource dataSource() {
+    SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
+
+    dataSource.setDriverClass(com.mysql.jdbc.Driver.class);
+    dataSource.setUrl("jdbc:mysql://localhost/springbook");
+    dataSource.setUsername("spring");
+    dataSource.setPassword("book");
+
+    return dataSource;
   }
 
   @Bean
