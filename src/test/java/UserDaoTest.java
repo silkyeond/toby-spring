@@ -4,24 +4,30 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.sql.SQLException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericXmlApplicationContext;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import toby.spring.object.dependecy.User;
 import toby.spring.object.dependecy.UserDao;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = "/applicationContext.xml")
 public class UserDaoTest {
+  //  @Autowired private ApplicationContext context;
+
   // setUp() 메소드에서 만드는 오브젝트를 테스트 메소드로 사용할 수 있도록 인스턴스 변수로 선언
-  private UserDao dao;
+  @Autowired private UserDao dao;
   private User user1;
   private User user2;
   private User user3;
 
   @BeforeEach
   public void setUp() {
-    ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
-    this.dao = context.getBean("userDao", UserDao.class);
-
+    //    System.out.println(this.context);
+    //    System.out.println(this);
+    //    this.dao = this.context.getBean("userDao", UserDao.class);
     this.user1 = new User("gyumee", "박상철", "springno1");
     this.user2 = new User("leegw700", "이길원", "springno2");
     this.user3 = new User("bumjin", "박범진", "springno3");
