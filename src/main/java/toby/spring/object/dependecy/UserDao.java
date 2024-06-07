@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-public class UserDao {
+public abstract class UserDao {
   private DataSource dataSource;
 
   public void setDataSource(DataSource dataSource) {
@@ -142,4 +142,6 @@ public class UserDao {
       }
     }
   }
+
+  protected abstract PreparedStatement makeStatement(Connection c) throws SQLException;
 }
