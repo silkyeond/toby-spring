@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-public abstract class UserDao {
+public class UserDao {
   private DataSource dataSource;
 
   public void setDataSource(DataSource dataSource) {
@@ -85,9 +85,12 @@ public abstract class UserDao {
     PreparedStatement ps = null;
 
     try {
-
       c = dataSource.getConnection();
-      ps = c.prepareStatement("delete from users");
+
+      // 전략 패턴을 따라 DeleteAllStatement가 적용
+      StatementStrategy strategy = new DeleteAllStatement();
+      ps = strategy.makePreparedStatement(c);
+
       ps.executeUpdate();
     } catch (SQLException e) {
       throw e;
@@ -142,6 +145,4 @@ public abstract class UserDao {
       }
     }
   }
-
-  protected abstract PreparedStatement makeStatement(Connection c) throws SQLException;
 }
