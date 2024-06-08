@@ -39,18 +39,8 @@ public class UserDao {
   //  }
 
   public void add(User user) throws SQLException {
-    //    Connection c = connectionMaker.makeConnection();
-    Connection c = dataSource.getConnection();
-    PreparedStatement ps =
-        c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
-    ps.setString(1, user.getId());
-    ps.setString(2, user.getName());
-    ps.setString(3, user.getPassword());
-
-    ps.executeUpdate();
-
-    ps.close();
-    c.close();
+    StatementStrategy st = new AddStatement(user);
+    jdbcContextWithStatementStrategy(st);
   }
 
   public User get(String id) throws SQLException {
@@ -87,10 +77,9 @@ public class UserDao {
     jdbcContextWithStatementStrategy(st);
   }
 
-
   /*
-  * @Params StatementStrategy stmt 클라이언트가 컨텍스트 호출할 때 넘겨줄 전략 파라미터
-  */
+   * @Params StatementStrategy stmt 클라이언트가 컨텍스트 호출할 때 넘겨줄 전략 파라미터
+   */
   public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
     Connection c = null;
     PreparedStatement ps = null;
