@@ -81,15 +81,23 @@ public class UserDao {
   }
 
   public void deleteAll() throws SQLException {
+    // 선정한 전략 클래스의 오브젝트 생성
+    StatementStrategy st = new DeleteAllStatement();
+    // 컨텍스트 호출, 전략 오브젝트 전달
+    jdbcContextWithStatementStrategy(st);
+  }
+
+
+  /*
+  * @Params StatementStrategy stmt 클라이언트가 컨텍스트 호출할 때 넘겨줄 전략 파라미터
+  */
+  public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
     Connection c = null;
     PreparedStatement ps = null;
 
     try {
       c = dataSource.getConnection();
-
-      // 전략 패턴을 따라 DeleteAllStatement가 적용
-      StatementStrategy strategy = new DeleteAllStatement();
-      ps = strategy.makePreparedStatement(c);
+      ps = stmt.makePreparedStatement(c);
 
       ps.executeUpdate();
     } catch (SQLException e) {
