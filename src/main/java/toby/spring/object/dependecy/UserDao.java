@@ -8,7 +8,12 @@ import javax.sql.DataSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 public class UserDao {
+  private JdbcContext jdbcContext;
   private DataSource dataSource;
+
+  public void setJdbcContext(JdbcContext jdbcContext) {
+    this.jdbcContext = jdbcContext;
+  }
 
   public void setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
@@ -39,8 +44,7 @@ public class UserDao {
   //  }
 
   public void add(final User user) throws SQLException {
-
-    jdbcContextWithStatementStrategy(
+    this.jdbcContext.workWithStatementStrategy(
         new StatementStrategy() {
           public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
             PreparedStatement ps =
@@ -81,13 +85,12 @@ public class UserDao {
   }
 
   public void deleteAll() throws SQLException {
-jdbcContextWithStatementStrategy(
+    this.jdbcContext.workWithStatementStrategy(
         new StatementStrategy() {
           public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
             return c.prepareStatement("delete from users");
           }
-        }
-);
+        });
   }
 
   /*

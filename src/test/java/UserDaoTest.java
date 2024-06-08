@@ -13,7 +13,7 @@ import toby.spring.object.dependecy.User;
 import toby.spring.object.dependecy.UserDao;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = "/applicationContext.xml")
+@ContextConfiguration(locations = "/test-applicationContext.xml")
 public class UserDaoTest {
   //  @Autowired private ApplicationContext context;
 
