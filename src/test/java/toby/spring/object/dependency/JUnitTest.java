@@ -1,3 +1,5 @@
+package toby.spring.object.dependency;
+
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.HashSet;
