@@ -22,16 +22,28 @@ public class JdbcContext {
       ps.executeUpdate();
     } catch (SQLException e) {
       throw e;
-    } finally{
-      if (ps != null){
-        try{
+    } finally {
+      if (ps != null) {
+        try {
           ps.close();
-        } catch (SQLException e){}
-      } if (c!= null){
-        try{
+        } catch (SQLException e) {
+        }
+      }
+      if (c != null) {
+        try {
           c.close();
-        } catch (SQLException e){}
+        } catch (SQLException e) {
+        }
       }
     }
+  }
+
+  public void executeSql(final String query) throws SQLException {
+    workWithStatementStrategy(
+        new StatementStrategy() {
+          public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+            return c.prepareStatement(query);
+          }
+        });
   }
 }
