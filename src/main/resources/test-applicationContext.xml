@@ -11,10 +11,5 @@
 
     <bean id="userDao" class="toby.spring.object.dependecy.UserDao">
         <property name="dataSource" ref="dataSource"/>
-        <property name="jdbcContext" ref="jdbcContext"/>
-    </bean>
-
-    <bean id="jdbcContext" class="toby.spring.object.dependecy.JdbcContext">
-        <property name="dataSource" ref="dataSource"/>
     </bean>
 </beans>
