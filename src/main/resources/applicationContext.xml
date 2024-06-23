@@ -5,7 +5,7 @@
 
     <!--    <bean id="connectionMaker" class="toby.spring.object.dependecy.DConnectionMaker"/>-->
 
-    <!--    <bean id="userDao" class="toby.spring.object.dependecy.UserDao">-->
+    <!--    <bean id="userDao" class="toby.spring.object.dependecy.dao.UserDaoJdbc">-->
     <!--        <property name="connectionMaker" ref="connectionMaker"/>-->
     <!--    </bean>-->
 
@@ -16,7 +16,7 @@
         <property name="password" value="book"/>
     </bean>
 
-    <bean id="userDao" class="toby.spring.object.dependecy.UserDao">
+    <bean id="userDao" class="toby.spring.object.dependecy.dao.UserDaoJdbc">
         <property name="dataSource" ref="dataSource"/>
     </bean>
 </beans>

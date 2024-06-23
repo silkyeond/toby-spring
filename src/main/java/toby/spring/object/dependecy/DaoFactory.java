@@ -4,17 +4,18 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import toby.spring.object.dependecy.dao.UserDaoJdbc;
 
 @Configuration
 public class DaoFactory {
 
   @Bean
-  public UserDao userDao() {
+  public UserDaoJdbc userDao() {
     //        UserDao userDao = new UserDao();
     //    userDao.setDataSource(dataSource());
     // 수정자 메소드 DI를 사용하는 팩토리 메소드
     //    userDao.setConnectionMaker(connectionMaker());
-    return new UserDao();
+    return new UserDaoJdbc();
   }
 
   @Bean

@@ -1,5 +1,7 @@
 package toby.spring.object.dependecy;
 
+import toby.spring.object.dependecy.user.domain.User;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

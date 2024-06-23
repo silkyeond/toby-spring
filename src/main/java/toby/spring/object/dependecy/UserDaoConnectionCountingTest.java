@@ -2,12 +2,14 @@ package toby.spring.object.dependecy;
 
 import java.sql.SQLException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import toby.spring.object.dependecy.dao.UserDaoJdbc;
+import toby.spring.object.dependecy.user.domain.User;
 
 public class UserDaoConnectionCountingTest {
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
     AnnotationConfigApplicationContext context =
         new AnnotationConfigApplicationContext(CountingDaoFactory.class);
-    UserDao dao = context.getBean("userDao", UserDao.class);
+    UserDaoJdbc dao = context.getBean("userDao", UserDaoJdbc.class);
 
     User user = new User();
 

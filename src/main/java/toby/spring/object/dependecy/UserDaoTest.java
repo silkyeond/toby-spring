@@ -3,6 +3,8 @@ package toby.spring.object.dependecy;
 import java.sql.SQLException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import toby.spring.object.dependecy.dao.UserDaoJdbc;
+import toby.spring.object.dependecy.user.domain.User;
 
 public class UserDaoTest {
   public static void main(String[] args) throws SQLException, ClassNotFoundException {
@@ -12,7 +14,7 @@ public class UserDaoTest {
     // XML을 이용해 애플리케이션 컨텍스트 생성
     ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
 
-    UserDao dao = context.getBean("userDao", UserDao.class);
+    UserDaoJdbc dao = context.getBean("userDao", UserDaoJdbc.class);
     User user = new User();
 
     user.setId("whiteship");
