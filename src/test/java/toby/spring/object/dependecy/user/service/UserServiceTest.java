@@ -7,6 +7,7 @@ import static toby.spring.object.dependecy.user.service.UserService.MIN_RECCOMEN
 
 import java.util.Arrays;
 import java.util.List;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,7 @@ import toby.spring.object.dependecy.user.service.UserService.TestUserServiceExce
 class UserServiceTest {
   @Autowired UserService userService;
   @Autowired UserDao userDao;
+  @Autowired DataSource dataSource;
   List<User> users;
 
   @BeforeEach
@@ -42,7 +44,7 @@ class UserServiceTest {
   }
 
   @Test
-  public void upgradeLevels() {
+  public void upgradeLevels() throws Exception {
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
 
@@ -74,10 +76,11 @@ class UserServiceTest {
   }
 
   @Test
-  public void upgradeAllOrNothing() {
+  public void upgradeAllOrNothing() throws Exception {
     UserService testUserService = new UserService.TestUserService(users.get(3).getId());
     // 테스트 메소드에서만 특별한 목적으로 사용되는 것으로 동작하는데 필요한 DAO만 수동 DI해준다.
     testUserService.setUserDao(this.userDao);
+    testUserService.setDataSource(this.dataSource);
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
 
