@@ -5,21 +5,25 @@ import static org.junit.jupiter.api.Assertions.*;
 import static toby.spring.object.dependecy.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
 import static toby.spring.object.dependecy.user.service.UserService.MIN_RECCOMEND_ROR_GOLD;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
-import toby.spring.object.dependecy.user.service.UserService.TestUserServiceException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/test-applicationContext.xml")
@@ -48,9 +52,13 @@ class UserServiceTest {
   }
 
   @Test
+  @DirtiesContext // 컨텍스트의 DI 설정을 변경하는 테스트
   public void upgradeLevels() throws Exception {
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
+
+    MocMailSender mocMailSender = new MocMailSender();
+    userService.setMailSender(mocMailSender);
 
     userService.upgradeLevels();
 
@@ -59,6 +67,11 @@ class UserServiceTest {
     checkLevel1Upgraded(users.get(2), false);
     checkLevel1Upgraded(users.get(3), true);
     checkLevel1Upgraded(users.get(4), false);
+
+    List<String> request = mocMailSender.getRequests();
+    assertThat(request.size()).isEqualTo(2);
+    assertThat(request.get(0)).isEqualTo(users.get(0).getMail());
+    assertThat(request.get(1)).isEqualTo(users.get(3).getMail());
   }
 
   @Test
@@ -81,7 +94,7 @@ class UserServiceTest {
 
   @Test
   public void upgradeAllOrNothing() {
-    UserService testUserService = new UserService.TestUserService(users.get(3).getId());
+    UserService testUserService = new TestUserService(users.get(3).getId());
     // 테스트 메소드에서만 특별한 목적으로 사용되는 것으로 동작하는데 필요한 DAO만 수동 DI해준다.
     testUserService.setUserDao(this.userDao);
     testUserService.setTransactionManager(transactionManager);
@@ -110,5 +123,39 @@ class UserServiceTest {
     } else {
       assertThat(userUpdate.getLevel()).isEqualTo(user.getLevel());
     }
+  }
+
+  static class TestUserService extends UserService {
+    private String id;
+
+    private TestUserService(String id) {
+      this.id = id;
+    }
+
+    // UserService method override
+    protected void upgradeLevel(User user) {
+      if (user.getId().equals(this.id)) throw new TestUserServiceException();
+      super.upgradeLevel(user);
+    }
+  }
+
+  static class TestUserServiceException extends RuntimeException {}
+
+  static class MocMailSender implements MailSender {
+    private List<String> requests = new ArrayList<>();
+
+    // UserService로부터 전송 요청을 받은 이메일 주소를 저장해두고 이를 읽을 수 있게 한다.
+    public List<String> getRequests() {
+      return requests;
+    }
+
+    @Override
+    public void send(SimpleMailMessage mailMessage) throws MailException {
+      // 전송 요청을 받은 이메일 주소를 저장해둔다.
+      requests.add(Objects.requireNonNull(mailMessage.getTo())[0]);
+    }
+
+    @Override
+    public void send(SimpleMailMessage... mailMessage) throws MailException {}
   }
 }

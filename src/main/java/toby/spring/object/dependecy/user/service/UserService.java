@@ -85,20 +85,4 @@ public class UserService {
 
     this.mailSender.send(mailMessage);
   }
-
-  static class TestUserService extends UserService {
-    private String id;
-
-    TestUserService(String id) {
-      this.id = id;
-    }
-
-    // UserService method override
-    protected void upgradeLevel(User user) {
-      if (user.getId().equals(this.id)) throw new TestUserServiceException();
-      super.upgradeLevel(user);
-    }
-  }
-
-  static class TestUserServiceException extends RuntimeException {}
 }
