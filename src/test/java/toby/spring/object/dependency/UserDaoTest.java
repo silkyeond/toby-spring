@@ -31,9 +31,9 @@ public class UserDaoTest {
     //    System.out.println(this.context);
     //    System.out.println(this);
     //    this.dao = this.context.getBean("userDao", UserDao.class);
-    this.user1 = new User("gyumee", "박상철", "springno1", Level.BASIC, 1, 0);
-    this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10);
-    this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40);
+    this.user1 = new User("gyumee", "박상철", "springno1", Level.BASIC, 1, 0,"mail");
+    this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10,"mail");
+    this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40,"mail");
   }
 
   @Test
@@ -132,5 +132,6 @@ public class UserDaoTest {
     assertThat(user1.getLevel()).isEqualTo(user2.getLevel());
     assertThat(user1.getLogin()).isEqualTo(user2.getLogin());
     assertThat(user1.getRecommend()).isEqualTo(user2.getRecommend());
+    assertThat(user1.getMail()).isEqualTo(user2.getMail());
   }
 }

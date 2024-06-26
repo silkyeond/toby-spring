@@ -16,9 +16,12 @@
     <bean id="userService" class="toby.spring.object.dependecy.user.service.UserService">
         <property name="userDao" ref="userDao"/>
         <property name="transactionManager" ref="transactionManager"/>
+        <property name="mailSender" ref="mailSender"/>
     </bean>
 
     <bean id="userDao" class="toby.spring.object.dependecy.dao.UserDaoJdbc">
         <property name="dataSource" ref="dataSource"/>
     </bean>
+
+    <bean id="mailSender" class="toby.spring.object.dependecy.user.service.DummyMailSender"/>
 </beans>

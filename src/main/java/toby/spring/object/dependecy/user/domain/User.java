@@ -20,6 +20,7 @@ public class User {
   Level level;
   int login;
   int recommend;
+  String mail;
 
   public void upgradeLevel() {
     Level nextLevel = this.level.nextLevel();

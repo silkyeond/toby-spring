@@ -1,6 +1,8 @@
 package toby.spring.object.dependecy.user.service;
 
 import java.util.List;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -10,14 +12,21 @@ import toby.spring.object.dependecy.user.domain.User;
 
 public class UserService {
   UserDao userDao;
+
+  public void setUserDao(UserDao userDao) {
+    this.userDao = userDao;
+  }
+
   private PlatformTransactionManager transactionManager;
 
   public void setTransactionManager(PlatformTransactionManager transactionManager) {
     this.transactionManager = transactionManager;
   }
 
-  public void setUserDao(UserDao userDao) {
-    this.userDao = userDao;
+  private MailSender mailSender;
+
+  public void setMailSender(MailSender mailSender) {
+    this.mailSender = mailSender;
   }
 
   public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
@@ -64,6 +73,17 @@ public class UserService {
   protected void upgradeLevel(User user) {
     user.upgradeLevel();
     userDao.update(user);
+    sendUpgradeEMail(user);
+  }
+
+  private void sendUpgradeEMail(User user) {
+    SimpleMailMessage mailMessage = new SimpleMailMessage();
+    mailMessage.setTo(user.getMail());
+    mailMessage.setFrom("useradmin@ksug.org");
+    mailMessage.setSubject("Upgrade 안내");
+    mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
+
+    this.mailSender.send(mailMessage);
   }
 
   static class TestUserService extends UserService {

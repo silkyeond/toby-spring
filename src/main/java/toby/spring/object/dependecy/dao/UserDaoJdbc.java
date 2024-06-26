@@ -19,13 +19,14 @@ public class UserDaoJdbc implements UserDao {
 
   public void add(final User user) {
     this.jdbcTemplate.update(
-        "insert into users(id, name, password, level, login, recommend) values(?,?,?,?,?,?)",
+        "insert into users(id, name, password, level, login, recommend, mail) values(?,?,?,?,?,?,?)",
         user.getId(),
         user.getName(),
         user.getPassword(),
         user.getLevel().intVal(),
         user.getLogin(),
-        user.getRecommend());
+        user.getRecommend(),
+        user.getMail());
   }
 
   public User get(String id) {
@@ -48,12 +49,13 @@ public class UserDaoJdbc implements UserDao {
   @Override
   public void update(User user) {
     this.jdbcTemplate.update(
-        "update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ?",
+        "update users set name = ?, password = ?, level = ?, login = ?, recommend = ?, mail = ? where id = ?",
         user.getName(),
         user.getPassword(),
         user.getLevel().intVal(),
         user.getLogin(),
         user.getRecommend(),
+        user.getMail(),
         user.getId());
   }
 
@@ -68,6 +70,7 @@ public class UserDaoJdbc implements UserDao {
           user.setLevel(Level.valueOf(rs.getInt("level")));
           user.setLogin(rs.getInt("login"));
           user.setRecommend(rs.getInt("recommend"));
+          user.setMail(rs.getString("mail"));
           return user;
         }
       };

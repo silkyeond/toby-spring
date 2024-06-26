@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,17 +28,18 @@ class UserServiceTest {
   @Autowired UserDao userDao;
   @Autowired DataSource dataSource;
   @Autowired PlatformTransactionManager transactionManager;
+  @Autowired MailSender mailSender;
   List<User> users;
 
   @BeforeEach
   public void setUp() {
     users =
         Arrays.asList(
-            new User("bumjin", "박범진", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0),
-            new User("joytouch", "강명성", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0),
-            new User("erwins", "신승한", "p3", Level.SILVER, 60, MIN_RECCOMEND_ROR_GOLD - 1),
-            new User("madnite1", "이상호", "p4", Level.SILVER, 60, MIN_RECCOMEND_ROR_GOLD),
-            new User("green", "오민규", "p5", Level.GOLD, 100, Integer.MAX_VALUE));
+            new User("bumjin", "박범진", "p1", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER - 1, 0, "mail"),
+            new User("joytouch", "강명성", "p2", Level.BASIC, MIN_LOGCOUNT_FOR_SILVER, 0, "mail"),
+            new User("erwins", "신승한", "p3", Level.SILVER, 60, MIN_RECCOMEND_ROR_GOLD - 1, "mail"),
+            new User("madnite1", "이상호", "p4", Level.SILVER, 60, MIN_RECCOMEND_ROR_GOLD, "mail"),
+            new User("green", "오민규", "p5", Level.GOLD, 100, Integer.MAX_VALUE, "mail"));
   }
 
   @Test
@@ -78,11 +80,12 @@ class UserServiceTest {
   }
 
   @Test
-  public void upgradeAllOrNothing() throws Exception {
+  public void upgradeAllOrNothing() {
     UserService testUserService = new UserService.TestUserService(users.get(3).getId());
     // 테스트 메소드에서만 특별한 목적으로 사용되는 것으로 동작하는데 필요한 DAO만 수동 DI해준다.
     testUserService.setUserDao(this.userDao);
     testUserService.setTransactionManager(transactionManager);
+    testUserService.setMailSender(mailSender);
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
 
