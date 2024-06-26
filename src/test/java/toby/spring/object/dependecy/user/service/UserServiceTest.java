@@ -2,8 +2,8 @@ package toby.spring.object.dependecy.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static toby.spring.object.dependecy.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static toby.spring.object.dependecy.user.service.UserService.MIN_RECCOMEND_ROR_GOLD;
+import static toby.spring.object.dependecy.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static toby.spring.object.dependecy.user.service.UserServiceImpl.MIN_RECCOMEND_ROR_GOLD;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +29,7 @@ import toby.spring.object.dependecy.user.domain.User;
 @ContextConfiguration(locations = "/test-applicationContext.xml")
 class UserServiceTest {
   @Autowired UserService userService;
+  @Autowired UserServiceImpl userServiceImpl;
   @Autowired UserDao userDao;
   @Autowired DataSource dataSource;
   @Autowired PlatformTransactionManager transactionManager;
@@ -58,7 +59,7 @@ class UserServiceTest {
     for (User user : users) userDao.add(user);
 
     MocMailSender mocMailSender = new MocMailSender();
-    userService.setMailSender(mocMailSender);
+    userServiceImpl.setMailSender(mocMailSender);
 
     userService.upgradeLevels();
 
@@ -94,16 +95,20 @@ class UserServiceTest {
 
   @Test
   public void upgradeAllOrNothing() {
-    UserService testUserService = new TestUserService(users.get(3).getId());
+    TestUserService testUserService = new TestUserService(users.get(3).getId());
     // 테스트 메소드에서만 특별한 목적으로 사용되는 것으로 동작하는데 필요한 DAO만 수동 DI해준다.
     testUserService.setUserDao(this.userDao);
-    testUserService.setTransactionManager(transactionManager);
     testUserService.setMailSender(mailSender);
+
+    UserServiceTx txUserService = new UserServiceTx();
+    txUserService.setTransactionManager(transactionManager);
+    txUserService.setUserService(testUserService);
+
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
 
     try {
-      testUserService.upgradeLevels();
+      txUserService.upgradeLevels();
       fail("TestUserServiceException expected");
     } catch (TestUserServiceException e) {
     }
@@ -125,7 +130,7 @@ class UserServiceTest {
     }
   }
 
-  static class TestUserService extends UserService {
+  static class TestUserService extends UserServiceImpl {
     private String id;
 
     private TestUserService(String id) {
