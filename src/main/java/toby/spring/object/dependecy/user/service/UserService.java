@@ -1,21 +1,19 @@
 package toby.spring.object.dependecy.user.service;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
-import javax.sql.DataSource;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
 
 public class UserService {
   UserDao userDao;
-  private DataSource dataSource;
+  private PlatformTransactionManager transactionManager;
 
-  public void setDataSource(DataSource dataSource) {
-    this.dataSource = dataSource;
+  public void setTransactionManager(PlatformTransactionManager transactionManager) {
+    this.transactionManager = transactionManager;
   }
 
   public void setUserDao(UserDao userDao) {
@@ -25,12 +23,11 @@ public class UserService {
   public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
   public static final int MIN_RECCOMEND_ROR_GOLD = 30;
 
-  public void upgradeLevels() throws Exception {
-    // 트랜잭션 동기화 관리자를 이용해 동기화 작업 초기화
-    TransactionSynchronizationManager.initSynchronization();
-    // DB Connection를 생성하고 트랜잭션을 시작. 이후 DAO 작업은 모두 여기서 시작한 트랜잭션 안에서 진행
-    Connection c = DataSourceUtils.getConnection(dataSource);
-    c.setAutoCommit(false);
+  public void upgradeLevels() {
+    TransactionStatus status =
+        // DI 받은 트랜잭션 매니저를 공유해서 사용, 멀티 스레드 환경에서 안전하다.
+        this.transactionManager.getTransaction(new DefaultTransactionDefinition());
+
     try {
       List<User> users = userDao.getAll();
       for (User user : users) {
@@ -38,14 +35,10 @@ public class UserService {
           upgradeLevel(user);
         }
       }
-      c.commit();
+      this.transactionManager.commit(status);
     } catch (Exception e) {
-      c.rollback();
+      this.transactionManager.rollback(status);
       throw e;
-    } finally {
-      DataSourceUtils.releaseConnection(c, dataSource);
-      TransactionSynchronizationManager.unbindResource(this.dataSource);
-      TransactionSynchronizationManager.clearSynchronization();
     }
   }
 

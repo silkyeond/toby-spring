@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.PlatformTransactionManager;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
@@ -25,6 +26,7 @@ class UserServiceTest {
   @Autowired UserService userService;
   @Autowired UserDao userDao;
   @Autowired DataSource dataSource;
+  @Autowired PlatformTransactionManager transactionManager;
   List<User> users;
 
   @BeforeEach
@@ -80,7 +82,7 @@ class UserServiceTest {
     UserService testUserService = new UserService.TestUserService(users.get(3).getId());
     // 테스트 메소드에서만 특별한 목적으로 사용되는 것으로 동작하는데 필요한 DAO만 수동 DI해준다.
     testUserService.setUserDao(this.userDao);
-    testUserService.setDataSource(this.dataSource);
+    testUserService.setTransactionManager(transactionManager);
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
 
