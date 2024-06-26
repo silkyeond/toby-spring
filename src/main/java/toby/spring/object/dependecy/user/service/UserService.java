@@ -38,12 +38,7 @@ public class UserService {
         this.transactionManager.getTransaction(new DefaultTransactionDefinition());
 
     try {
-      List<User> users = userDao.getAll();
-      for (User user : users) {
-        if (canUpgradeLevel(user)) {
-          upgradeLevel(user);
-        }
-      }
+      upgradeLevelsInternal();
       this.transactionManager.commit(status);
     } catch (Exception e) {
       this.transactionManager.rollback(status);
@@ -84,5 +79,14 @@ public class UserService {
     mailMessage.setText("사용자님의 등급이 " + user.getLevel().name());
 
     this.mailSender.send(mailMessage);
+  }
+
+  private void upgradeLevelsInternal() {
+    List<User> users = userDao.getAll();
+    for (User user : users) {
+      if (canUpgradeLevel(user)) {
+        upgradeLevel(user);
+      }
+    }
   }
 }
