@@ -2,6 +2,11 @@ package toby.spring.object.dependecy.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static toby.spring.object.dependecy.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static toby.spring.object.dependecy.user.service.UserServiceImpl.MIN_RECCOMEND_ROR_GOLD;
 
@@ -13,6 +18,7 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
@@ -59,6 +65,7 @@ class UserServiceTest {
     UserServiceImpl userServiceImpl = new UserServiceImpl();
     // 목 오브젝트로 만든 UserDao를 직접 DI 해준다.
     MockUserDao mockUserDao = new MockUserDao(this.users);
+
     userServiceImpl.setUserDao(mockUserDao);
 
     MocMailSender mocMailSender = new MocMailSender();
@@ -117,6 +124,36 @@ class UserServiceTest {
     }
 
     checkLevel1Upgraded(users.get(1), false);
+  }
+
+  @Test
+  public void mockUpgradeLevels() {
+    UserServiceImpl userServiceImpl = new UserServiceImpl();
+
+    UserDao mockUserDao = mock(UserDao.class);
+    when(mockUserDao.getAll()).thenReturn(this.users);
+    userServiceImpl.setUserDao(mockUserDao);
+
+    MailSender mockMailSender = mock(MailSender.class);
+    userServiceImpl.setMailSender(mockMailSender);
+
+    userServiceImpl.upgradeLevels();
+
+    verify(mockUserDao, times(2)).update(any(User.class));
+    verify(mockUserDao, times(2)).update(any(User.class));
+    verify(mockUserDao).update(users.get(1));
+    assertThat(users.get(1).getLevel()).isEqualTo(Level.SILVER);
+    verify(mockUserDao).update(users.get(3));
+    assertThat(users.get(3).getLevel()).isEqualTo(Level.GOLD);
+
+    ArgumentCaptor<SimpleMailMessage> mailMessageArg =
+            ArgumentCaptor.forClass(SimpleMailMessage.class);
+    verify(mockMailSender, times(2)).send(mailMessageArg.capture());
+    List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
+    assertThat(Objects.requireNonNull(mailMessages.get(0).getTo())[0])
+        .isEqualTo(users.get(1).getMail());
+    assertThat(Objects.requireNonNull(mailMessages.get(1).getTo())[0])
+        .isEqualTo(users.get(3).getMail());
   }
 
   private void checkLevel1Upgraded(User user, boolean upgraded) {
