@@ -108,6 +108,8 @@ class UserServiceTest {
   @Test
   public void upgradeAllOrNothing() {
     TestUserService testUserService = new TestUserService(users.get(3).getId());
+    testUserService.setUserDao(this.userDao);
+    testUserService.setMailSender(mailSender);
 
     TransactionHandler txHandler = new TransactionHandler();
     txHandler.setTarget(testUserService);
