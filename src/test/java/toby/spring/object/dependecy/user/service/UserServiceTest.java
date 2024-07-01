@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static toby.spring.object.dependecy.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static toby.spring.object.dependecy.user.service.UserServiceImpl.MIN_RECCOMEND_ROR_GOLD;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
+import toby.spring.object.dependecy.user.handler.TransactionHandler;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/test-applicationContext.xml")
@@ -106,13 +108,16 @@ class UserServiceTest {
   @Test
   public void upgradeAllOrNothing() {
     TestUserService testUserService = new TestUserService(users.get(3).getId());
-    // 테스트 메소드에서만 특별한 목적으로 사용되는 것으로 동작하는데 필요한 DAO만 수동 DI해준다.
-    testUserService.setUserDao(this.userDao);
-    testUserService.setMailSender(mailSender);
 
-    UserServiceTx txUserService = new UserServiceTx();
-    txUserService.setTransactionManager(transactionManager);
-    txUserService.setUserService(testUserService);
+    TransactionHandler txHandler = new TransactionHandler();
+    txHandler.setTarget(testUserService);
+    txHandler.setTransactionManager(transactionManager);
+    txHandler.setPattern("upgradeLevels");
+
+    UserService txUserService =
+        (UserService)
+            Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class[] {UserService.class}, txHandler);
 
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
@@ -147,7 +152,7 @@ class UserServiceTest {
     assertThat(users.get(3).getLevel()).isEqualTo(Level.GOLD);
 
     ArgumentCaptor<SimpleMailMessage> mailMessageArg =
-            ArgumentCaptor.forClass(SimpleMailMessage.class);
+        ArgumentCaptor.forClass(SimpleMailMessage.class);
     verify(mockMailSender, times(2)).send(mailMessageArg.capture());
     List<SimpleMailMessage> mailMessages = mailMessageArg.getAllValues();
     assertThat(Objects.requireNonNull(mailMessages.get(0).getTo())[0])
