@@ -19,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -37,7 +36,7 @@ import toby.spring.object.dependecy.user.domain.User;
 @ContextConfiguration(locations = "/test-applicationContext.xml")
 class UserServiceTest {
   @Autowired UserService userService;
-  @Autowired UserServiceImpl userServiceImpl;
+  @Autowired UserService testUserService;
   @Autowired UserDao userDao;
   @Autowired DataSource dataSource;
   @Autowired PlatformTransactionManager transactionManager;
@@ -107,22 +106,12 @@ class UserServiceTest {
   }
 
   @Test
-  @DirtiesContext
   public void upgradeAllOrNothing() throws Exception {
-    TestUserService testUserService = new TestUserService(users.get(3).getId());
-    testUserService.setUserDao(this.userDao);
-    testUserService.setMailSender(mailSender);
-
-    ProxyFactoryBean txProxyFactoryBean =
-        context.getBean("&userService", ProxyFactoryBean.class);
-    txProxyFactoryBean.setTarget(testUserService);
-    UserService txUserService = (UserService) txProxyFactoryBean.getObject();
-
     userDao.deleteAll();
     for (User user : users) userDao.add(user);
 
     try {
-      txUserService.upgradeLevels();
+      this.testUserService.upgradeLevels();
       fail("TestUserServiceException expected");
     } catch (TestUserServiceException e) {
     }
@@ -160,6 +149,11 @@ class UserServiceTest {
         .isEqualTo(users.get(3).getMail());
   }
 
+  @Test
+  public void advisorAutoProxyCreator() {
+    assertThat(java.lang.reflect.Proxy.isProxyClass(testUserService.getClass())).isTrue();
+  }
+
   private void checkLevel1Upgraded(User user, boolean upgraded) {
     User userUpdate = userDao.get(user.getId());
     if (upgraded) {
@@ -174,12 +168,8 @@ class UserServiceTest {
     assertThat(updated.getLevel()).isEqualTo(expectedLevel);
   }
 
-  static class TestUserService extends UserServiceImpl {
-    private String id;
-
-    private TestUserService(String id) {
-      this.id = id;
-    }
+  static class TestUserServiceImpl extends UserServiceImpl {
+    private String id = "madnite1";
 
     // UserService method override
     protected void upgradeLevel(User user) {
