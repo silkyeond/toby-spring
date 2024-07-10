@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
@@ -154,6 +155,11 @@ class UserServiceTest {
     assertThat(java.lang.reflect.Proxy.isProxyClass(testUserService.getClass())).isTrue();
   }
 
+  @Test
+  public void readOnlyTransactionAttribute() {
+    assertThrows(TransientDataAccessResourceException.class, () -> testUserService.getAll());
+  }
+
   private void checkLevel1Upgraded(User user, boolean upgraded) {
     User userUpdate = userDao.get(user.getId());
     if (upgraded) {
@@ -175,6 +181,14 @@ class UserServiceTest {
     protected void upgradeLevel(User user) {
       if (user.getId().equals(this.id)) throw new TestUserServiceException();
       super.upgradeLevel(user);
+    }
+
+    @Override
+    public List<User> getAll() {
+      for (User user : super.getAll()) {
+        super.update(user);
+      }
+      return null;
     }
   }
 
