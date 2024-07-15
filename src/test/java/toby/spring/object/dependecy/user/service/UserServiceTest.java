@@ -29,6 +29,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
@@ -158,6 +160,20 @@ class UserServiceTest {
   @Test
   public void readOnlyTransactionAttribute() {
     assertThrows(TransientDataAccessResourceException.class, () -> testUserService.getAll());
+  }
+
+  @Test
+  public void transactionSync() {
+    DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();
+    TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
+
+    try {
+      userDao.deleteAll();
+      userService.add(users.get(0));
+      userService.add(users.get(1));
+    } finally {
+      transactionManager.rollback(txStatus);
+    }
   }
 
   private void checkLevel1Upgraded(User user, boolean upgraded) {
