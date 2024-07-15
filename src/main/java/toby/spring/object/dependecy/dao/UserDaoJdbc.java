@@ -3,6 +3,7 @@ package toby.spring.object.dependecy.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -17,15 +18,15 @@ public class UserDaoJdbc implements UserDao {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
-  private String sqlAdd;
+  private Map<String, String> sqlMap;
 
-  public void setSqlAdd(String sqlAdd) {
-    this.sqlAdd = sqlAdd;
+  public void setSqlMap(Map<String, String> sqlMap) {
+    this.sqlMap = sqlMap;
   }
 
   public void add(final User user) {
     this.jdbcTemplate.update(
-        this.sqlAdd,
+        this.sqlMap.get("add"),
         user.getId(),
         user.getName(),
         user.getPassword(),
