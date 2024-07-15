@@ -17,9 +17,15 @@ public class UserDaoJdbc implements UserDao {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
+  private String sqlAdd;
+
+  public void setSqlAdd(String sqlAdd) {
+    this.sqlAdd = sqlAdd;
+  }
+
   public void add(final User user) {
     this.jdbcTemplate.update(
-        "insert into users(id, name, password, level, login, recommend, mail) values(?,?,?,?,?,?,?)",
+        this.sqlAdd,
         user.getId(),
         user.getName(),
         user.getPassword(),
