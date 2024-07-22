@@ -49,7 +49,7 @@ public class UserDaoJdbc implements UserDao {
   }
 
   public int getCount() {
-    return this.jdbcTemplate.queryForObject(this.sqlService.getSql("userGetCount"), int.class);
+    return this.jdbcTemplate.queryForObject(this.sqlService.getSql("userGetCount"), Integer.class);
   }
 
   @Override
