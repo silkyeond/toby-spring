@@ -37,7 +37,7 @@ public class UserDaoJdbc implements UserDao {
   }
 
   public User get(String id) {
-    return this.jdbcTemplate.queryForObject(this.sqlService.getSql("userGet"), this.userMapper);
+    return jdbcTemplate.queryForObject(sqlService.getSql("userGet"), new Object[] {id}, userMapper);
   }
 
   public List<User> getAll() {
