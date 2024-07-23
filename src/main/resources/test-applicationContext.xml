@@ -39,11 +39,7 @@
         <property name="sqlService" ref="sqlService"/>
     </bean>
 
-    <bean id="sqlService" class="toby.spring.object.dependecy.user.sqlservice.XmlSqlService">
-        <property name="sqlReader" ref="sqlService"/>
-        <property name="sqlRegistry" ref="sqlService"/>
-        <property name="sqlmapFile" value="sqlmap.xml"/>
-    </bean>
+    <bean id="sqlService" class="toby.spring.object.dependecy.user.sqlservice.DefaultSqlService"/>
 
     <bean id="mailSender" class="toby.spring.object.dependecy.user.service.DummyMailSender"/>
 
