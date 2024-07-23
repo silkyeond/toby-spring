@@ -17,7 +17,7 @@ public class XmlSqlService implements SqlService {
     try {
       JAXBContext context = JAXBContext.newInstance(contextPath);
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      InputStream is = this.getClass().getClassLoader().getResourceAsStream("/sqlmap.xml");
+      InputStream is = this.getClass().getClassLoader().getResourceAsStream("sqlmap.xml");
       Sqlmap sqlmap = (Sqlmap) unmarshaller.unmarshal(is);
 
       for (SqlType sql : sqlmap.getSql()) {
