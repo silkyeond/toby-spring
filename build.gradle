@@ -37,7 +37,7 @@ dependencies {
     implementation 'com.sun.xml.bind:jaxb-ri:2.3.5'
     implementation 'javax.xml.bind:jaxb-api:2.3.1' // JAXB API
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1' // JAXB 런타임
-
+    implementation 'org.hsqldb:hsqldb:2.7.3'
 }
 
 test {

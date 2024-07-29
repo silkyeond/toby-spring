@@ -3,12 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                             https://www.springframework.org/schema/beans/spring-beans.xsd
                             http://www.springframework.org/schema/tx
                             http://www.springframework.org/schema/tx/spring-tx.xsd
                             http://www.springframework.org/schema/context
-                            http://www.springframework.org/schema/context/spring-context.xsd">
+                            http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/jdbc
+                            http://www.springframework.org/schema/jdbc/spring-jdbc.xsd">
 
     <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
         <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
@@ -45,7 +48,9 @@
         <property name="sqlmap" value="classpath:sqlmap.xml"/>
     </bean>
 
-    <bean id="sqlRegistry" class="toby.spring.object.dependecy.user.sqlservice.updatable.ConcurrentHashMapSqlRegistry"/>
+    <bean id="sqlRegistry" class="toby.spring.object.dependecy.user.sqlservice.updatable.EmbeddedDbSqlRegistry">
+        <property name="dataSource" ref="embeddedDatabase"/>
+    </bean>
 
     <bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPath" value="toby.spring.object.dependecy.user.sqlservice.jaxb"/>
@@ -61,4 +66,7 @@
 
     <tx:annotation-driven/>
     <context:annotation-config/>
+    <jdbc:embedded-database id="embeddedDatabase" type="HSQL">
+        <jdbc:script location="classpath:schema.sql"/>
+    </jdbc:embedded-database>
 </beans>
