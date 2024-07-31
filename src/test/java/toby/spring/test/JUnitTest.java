@@ -1,4 +1,4 @@
-package toby.spring.object.dependency;
+package toby.spring.test;
 
 import static org.assertj.core.api.Assertions.*;
 
