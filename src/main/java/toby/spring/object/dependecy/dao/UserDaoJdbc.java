@@ -4,25 +4,29 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
 import toby.spring.object.dependecy.user.sqlservice.SqlService;
 
+@Repository
 public class UserDaoJdbc implements UserDao {
   private JdbcTemplate jdbcTemplate;
 
+  @Autowired
   public void setDataSource(DataSource dataSource) {
     // dataSource 오브젝트는 JdbcTemplate을 만든 후에는 사용하지 않아 저장해두지 않아도 됨
     this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
 
-  private SqlService sqlService;
+  @Autowired private SqlService sqlService;
 
-  public void setSqlService(SqlService sqlService) {
-    this.sqlService = sqlService;
-  }
+  //  public void setSqlService(SqlService sqlService) {
+  //    this.sqlService = sqlService;
+  //  }
 
   public void add(final User user) {
     this.jdbcTemplate.update(

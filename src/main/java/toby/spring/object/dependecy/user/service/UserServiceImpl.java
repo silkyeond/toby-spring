@@ -1,20 +1,23 @@
 package toby.spring.object.dependecy.user.service;
 
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Component;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
 
+@Component("userService")
 public class UserServiceImpl implements UserService {
-  UserDao userDao;
+  @Autowired private UserDao userDao;
 
   public void setUserDao(UserDao userDao) {
     this.userDao = userDao;
   }
 
-  private MailSender mailSender;
+  @Autowired private MailSender mailSender;
 
   public void setMailSender(MailSender mailSender) {
     this.mailSender = mailSender;
