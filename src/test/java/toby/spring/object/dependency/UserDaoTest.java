@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import toby.spring.TestApplicationContext;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = "/test-applicationContext.xml")
+@ContextConfiguration(classes = TestApplicationContext.class)
+// @ContextConfiguration(locations = "/test-applicationContext.xml")
 public class UserDaoTest {
   //  @Autowired private ApplicationContext context;
 
@@ -31,9 +33,9 @@ public class UserDaoTest {
     //    System.out.println(this.context);
     //    System.out.println(this);
     //    this.dao = this.context.getBean("userDao", UserDao.class);
-    this.user1 = new User("gyumee", "박상철", "springno1", Level.BASIC, 1, 0,"mail");
-    this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10,"mail");
-    this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40,"mail");
+    this.user1 = new User("gyumee", "박상철", "springno1", Level.BASIC, 1, 0, "mail");
+    this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10, "mail");
+    this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40, "mail");
   }
 
   @Test

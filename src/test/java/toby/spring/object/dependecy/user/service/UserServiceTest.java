@@ -31,12 +31,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import toby.spring.TestApplicationContext;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
+import toby.spring.object.dependecy.user.service.UserServiceImpl.TestUserServiceException;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = "/test-applicationContext.xml")
+@ContextConfiguration(classes = TestApplicationContext.class)
 class UserServiceTest {
   @Autowired UserService userService;
   @Autowired UserService testUserService;
@@ -189,26 +191,6 @@ class UserServiceTest {
     assertThat(updated.getId()).isEqualTo(expectedId);
     assertThat(updated.getLevel()).isEqualTo(expectedLevel);
   }
-
-  static class TestUserServiceImpl extends UserServiceImpl {
-    private String id = "madnite1";
-
-    // UserService method override
-    protected void upgradeLevel(User user) {
-      if (user.getId().equals(this.id)) throw new TestUserServiceException();
-      super.upgradeLevel(user);
-    }
-
-    @Override
-    public List<User> getAll() {
-      for (User user : super.getAll()) {
-        super.update(user);
-      }
-      return null;
-    }
-  }
-
-  static class TestUserServiceException extends RuntimeException {}
 
   static class MocMailSender implements MailSender {
     private List<String> requests = new ArrayList<>();
