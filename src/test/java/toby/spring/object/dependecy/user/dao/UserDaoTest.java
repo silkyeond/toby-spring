@@ -8,19 +8,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import toby.spring.AppContext;
 import toby.spring.TestAppContext;
+import toby.spring.object.dependecy.config.AppContext;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {AppContext.class, TestAppContext.class})
+@ActiveProfiles("test")
 public class UserDaoTest {
-
+  @Autowired DefaultListableBeanFactory beanFactory;
   // setUp() 메소드에서 만드는 오브젝트를 테스트 메소드로 사용할 수 있도록 인스턴스 변수로 선언
   @Autowired private UserDao dao;
   private User user1;
@@ -124,6 +127,13 @@ public class UserDaoTest {
 
     User user2same = dao.get(user2.getId());
     checkSameUser(user2, user2same);
+  }
+
+  @Test
+  public void beans() {
+    for (String n : beanFactory.getBeanDefinitionNames()) {
+      System.out.println(n + ":" + beanFactory.getBean(n).getClass().getName());
+    }
   }
 
   private void checkSameUser(User user1, User user2) {
