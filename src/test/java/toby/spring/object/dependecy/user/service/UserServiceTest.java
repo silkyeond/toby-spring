@@ -31,15 +31,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-import toby.spring.TestApplicationContext;
+import toby.spring.AppContext;
+import toby.spring.TestAppContext;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
-import toby.spring.object.dependecy.user.service.UserServiceImpl.TestUserServiceException;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestApplicationContext.class)
-class UserServiceTest {
+@ContextConfiguration(classes = {AppContext.class, TestAppContext.class})
+public class UserServiceTest {
   @Autowired UserService userService;
   @Autowired UserService testUserService;
   @Autowired UserDao userDao;
@@ -255,4 +255,24 @@ class UserServiceTest {
       throw new UnsupportedOperationException();
     }
   }
+
+  public static class TestUserService extends UserServiceImpl {
+    private String id = "madnite1";
+
+    // UserService method override
+    protected void upgradeLevel(User user) {
+      if (user.getId().equals(this.id)) throw new TestUserServiceException();
+      super.upgradeLevel(user);
+    }
+
+    @Override
+    public List<User> getAll() {
+      for (User user : super.getAll()) {
+        super.update(user);
+      }
+      return null;
+    }
+  }
+
+  static class TestUserServiceException extends RuntimeException {}
 }

@@ -6,24 +6,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
-import org.springframework.oxm.Unmarshaller;
-import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.service.DummyMailSender;
 import toby.spring.object.dependecy.user.service.UserService;
 import toby.spring.object.dependecy.user.service.UserServiceImpl;
-import toby.spring.object.dependecy.user.sqlservice.OxmSqlService;
-import toby.spring.object.dependecy.user.sqlservice.SqlService;
 
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = "toby.spring.object.dependecy")
-public class TestApplicationContext {
+@Import(SqlServiceContext.class)
+public class AppContext {
 
   @Autowired UserDao userDao;
 
@@ -55,47 +53,7 @@ public class TestApplicationContext {
   }
 
   @Bean
-  public UserService testUserService() {
-    UserServiceImpl.TestUserService testService = new UserServiceImpl.TestUserService();
-    testService.setUserDao(this.userDao);
-    testService.setMailSender(mailSender());
-    return testService;
-  }
-
-  @Bean
   public MailSender mailSender() {
     return new DummyMailSender();
   }
-
-  @Bean
-  public SqlService sqlService() {
-    OxmSqlService oxmSqlService = new OxmSqlService();
-    oxmSqlService.setUnmarshaller(unmarshaller());
-    //    oxmSqlService.setSqlRegistry(sqlRegistry());
-    //    oxmSqlService.setSqlmap("");
-    return oxmSqlService;
-  }
-
-  //  @Bean
-  //  public SqlRegistry sqlRegistry() {
-  //    EmbeddedDbSqlRegistry sqlRegistry = new EmbeddedDbSqlRegistry();
-  //    //    sqlRegistry.setDataSource(embeddedDatabase());
-  //    return sqlRegistry;
-  //  }
-
-  @Bean
-  public Unmarshaller unmarshaller() {
-    Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-    marshaller.setContextPath("toby.spring.object.dependecy.user.sqlservice.jaxb");
-    return marshaller;
-  }
-
-  //  @Bean
-  //  public DataSource embeddedDatabase() {
-  //    return new EmbeddedDatabaseBuilder()
-  //        .setName("embeddedDatabase")
-  //        .setType(EmbeddedDatabaseType.HSQL)
-  //        .addScript("classpath:schema.sql")
-  //        .build();
-  //  }
 }

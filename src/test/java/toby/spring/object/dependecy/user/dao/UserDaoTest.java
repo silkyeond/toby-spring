@@ -1,4 +1,4 @@
-package toby.spring.object.dependency;
+package toby.spring.object.dependecy.user.dao;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,16 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import toby.spring.TestApplicationContext;
+import toby.spring.AppContext;
+import toby.spring.TestAppContext;
 import toby.spring.object.dependecy.dao.UserDao;
 import toby.spring.object.dependecy.user.domain.Level;
 import toby.spring.object.dependecy.user.domain.User;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TestApplicationContext.class)
-// @ContextConfiguration(locations = "/test-applicationContext.xml")
+@ContextConfiguration(classes = {AppContext.class, TestAppContext.class})
 public class UserDaoTest {
-  //  @Autowired private ApplicationContext context;
 
   // setUp() 메소드에서 만드는 오브젝트를 테스트 메소드로 사용할 수 있도록 인스턴스 변수로 선언
   @Autowired private UserDao dao;
