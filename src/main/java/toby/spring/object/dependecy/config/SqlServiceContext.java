@@ -1,5 +1,6 @@
 package toby.spring.object.dependecy.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.Unmarshaller;
@@ -9,10 +10,13 @@ import toby.spring.object.dependecy.user.sqlservice.SqlService;
 
 @Configuration
 public class SqlServiceContext {
+  @Autowired SqlMapConfig sqlMapConfig;
+
   @Bean
   public SqlService sqlService() {
     OxmSqlService sqlService = new OxmSqlService();
     sqlService.setUnmarshaller(unmarshaller());
+    sqlService.setSqlmap(sqlMapConfig.getSqlMapResource());
     //    sqlService.setSqlRegistry(sqlRegistry());
     return sqlService;
   }

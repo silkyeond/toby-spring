@@ -9,10 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
@@ -24,9 +25,9 @@ import toby.spring.object.dependecy.dao.UserDao;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = "toby.spring.object.dependecy")
-@Import({SqlServiceContext.class, ProductionAppContext.class})
-@PropertySource("/database.properties")
-public class AppContext {
+@PropertySource("classpath:database.properties")
+@EnableSqlService
+public class AppContext implements SqlMapConfig {
 
   @Autowired UserDao userDao;
 
@@ -45,10 +46,14 @@ public class AppContext {
   @Bean
   public DataSource dataSource() {
     SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-    dataSource.setDriverClass(this.dbDriverClass);
-    dataSource.setUrl(this.url);
-    dataSource.setUsername(this.username);
-    dataSource.setPassword(this.password);
+    dataSource.setDriverClass(com.mysql.cj.jdbc.Driver.class);
+    dataSource.setUrl("jdbc:mysql://localhost/springbook?characterEncoding=UTF-8");
+    dataSource.setUsername("spring");
+    dataSource.setPassword("book");
+    //    dataSource.setDriverClass(dbDriverClass);
+    //    dataSource.setUrl(url);
+    //    dataSource.setUsername(username);
+    //    dataSource.setPassword(password);
 
     return dataSource;
   }
@@ -65,6 +70,11 @@ public class AppContext {
     JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
     mailSender.setHost("mail.mycompany.com");
     return mailSender;
+  }
+
+  @Override
+  public Resource getSqlMapResource() {
+    return new ClassPathResource("sqlmap.xml");
   }
 
   @Configuration
